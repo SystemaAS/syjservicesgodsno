@@ -65,7 +65,11 @@ public class JsonResponseOutputterController_GODSJF {
 	/**
 	 * Db-file: 	GODSJF
 	 * 
-	 * @Example SELECT list http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSJF.do?user=OSCAR&avd=1&sign=OT
+	 * @Example 
+	 * (1) SELECT list http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSJF.do?user=OSCAR
+	 * (2) Default list (last x-days from today):  http://localhost:8080/syjservicesgodsno/syjsSYGODSJF.do?user=OSCAR&dftdg=3
+	 * (3) Exact match godsnr: http://localhost:8080/syjservicesgodsno/syjsSYGODSJF.do?user=OSCAR&gogn=201801062173001
+	 * 
 	 * @return
 	 */
 	@RequestMapping(path="/syjsSYGODSJF.do",method = RequestMethod.GET)
@@ -73,6 +77,8 @@ public class JsonResponseOutputterController_GODSJF {
 		JsonGenericContainerDao container = new JsonGenericContainerDao();
 		
 		String gogn = request.getParameter("gogn");
+		String dftdg = request.getParameter("dftdg");
+		
 		List<GodsjfDao> list = new ArrayList<GodsjfDao>();
 		
 		try {
@@ -84,7 +90,7 @@ public class JsonResponseOutputterController_GODSJF {
 			StringBuffer dbErrorStackTrace = new StringBuffer();
 
 			if (StringUtils.hasValue(userName)) {
-				list = this.fetchRecords(gogn);
+				list = this.fetchRecords(gogn, dftdg);
 				
 				if (list != null) {
 					container.setUser(user);
@@ -124,20 +130,42 @@ public class JsonResponseOutputterController_GODSJF {
 	 * @param gogn (godsnr)
 	 * @return
 	 */
-	private List<GodsjfDao> fetchRecords(String gogn) {
+	private List<GodsjfDao> fetchRecords(String gogn, String dftdg) {
 		List<GodsjfDao> list = new ArrayList<GodsjfDao>();
+		Calendar calendar = Calendar.getInstance();
 		
 		if(StringUtils.hasValue(gogn)){
+			logger.info("EXACT MATCH: gogn");
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("gogn", gogn);
-			
 			//Exact match
 			list = godsjfDaoService.findAll(params);
+			
+		}else if(StringUtils.hasValue(dftdg)){
+			logger.info("DEFAULT from x-days to now");
+			String currentYear = String.valueOf(calendar.get(Calendar.YEAR)); 
+			list = godsjfDaoService.findDefault(currentYear, this.getFromDay(dftdg));
+		
 		}else{
+			logger.info("ALL RECORDS...");
 			list = godsjfDaoService.findAll(null);
+			
 		}
 		logger.info(list.size());
 		return list;
-	}	
+	}
+	
+	/**
+	 * 
+	 * @param dftdg
+	 * @return
+	 */
+	private String getFromDay(String dftdg){
+		int dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+		int daysBack = Integer.parseInt(dftdg);
+		return String.valueOf(dayOfYear - daysBack);
+	}
+	
+	
 	
 }
