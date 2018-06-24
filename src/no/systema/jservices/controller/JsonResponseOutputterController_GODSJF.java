@@ -34,6 +34,7 @@ import no.systema.jservices.common.util.StringUtils;
 //@RequestMapping(value="/syjsSYGODSJF.do")
 public class JsonResponseOutputterController_GODSJF {
 	private static final Logger logger = Logger.getLogger(JsonResponseOutputterController_GODSJF.class.getName());
+	private final Map<String, Object> ALL_RECORDS = null;
 	
 	@Autowired
 	private GodsjfDaoService godsjfDaoService;
@@ -148,7 +149,7 @@ public class JsonResponseOutputterController_GODSJF {
 		
 		}else{
 			logger.info("ALL RECORDS...");
-			list = godsjfDaoService.findAll(null);
+			list = godsjfDaoService.findAll(this.ALL_RECORDS, new StringBuffer("order by gogn desc"));
 			
 		}
 		logger.info(list.size());
