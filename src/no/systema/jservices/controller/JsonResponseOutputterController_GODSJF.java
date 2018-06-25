@@ -73,7 +73,7 @@ public class JsonResponseOutputterController_GODSJF {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(path="/syjsSYGODSJF.do",method = RequestMethod.GET)
+	@RequestMapping(path="/syjsSYGODSJF.do",method = { RequestMethod.GET, RequestMethod.POST } )
 	public JsonGenericContainerDao getSygodsjf(@RequestParam("user") String user, HttpSession session, HttpServletRequest request ){
 		JsonGenericContainerDao container = new JsonGenericContainerDao();
 		
