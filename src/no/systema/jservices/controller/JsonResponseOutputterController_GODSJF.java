@@ -68,8 +68,8 @@ public class JsonResponseOutputterController_GODSJF {
 	 * 
 	 * @Example 
 	 * (1) SELECT list http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSJF.do?user=OSCAR
-	 * (2) Default list (last x-days from today):  http://localhost:8080/syjservicesgodsno/syjsSYGODSJF.do?user=OSCAR&dftdg=3
-	 * (3) Exact match godsnr: http://localhost:8080/syjservicesgodsno/syjsSYGODSJF.do?user=OSCAR&gogn=201801062173001
+	 * (2) Default list (last x-days from today):  http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSJF.do?user=OSCAR&dftdg=3
+	 * (3) Exact match godsnr: http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSJF.do?user=OSCAR&gogn=201801062173001
 	 * 
 	 * @return
 	 */
