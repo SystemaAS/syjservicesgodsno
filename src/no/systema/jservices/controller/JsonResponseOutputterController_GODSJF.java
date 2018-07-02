@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -91,7 +92,11 @@ public class JsonResponseOutputterController_GODSJF {
 			StringBuffer dbErrorStackTrace = new StringBuffer();
 
 			if (StringUtils.hasValue(userName)) {
-				list = this.fetchRecords(gogn, dftdg);
+				GodsjfDao dao = new GodsjfDao();
+				ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
+				binder.bind(request);
+				
+				list = this.fetchRecords(gogn, dftdg, dao);
 				
 				if (list != null) {
 					container.setUser(user);
@@ -131,29 +136,52 @@ public class JsonResponseOutputterController_GODSJF {
 	 * @param gogn (godsnr)
 	 * @return
 	 */
-	private List<GodsjfDao> fetchRecords(String gogn, String dftdg) {
+	private List<GodsjfDao> fetchRecords(String gogn, String dftdg, GodsjfDao dao) {
 		List<GodsjfDao> list = new ArrayList<GodsjfDao>();
 		Calendar calendar = Calendar.getInstance();
 		
 		if(StringUtils.hasValue(gogn)){
-			logger.info("EXACT MATCH: gogn");
+			logger.info("MATCH: gogn");
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("gogn", gogn);
+			params.put("gogn", gogn + "%");
 			//Exact match
 			list = godsjfDaoService.findAll(params);
 			
 		}else if(StringUtils.hasValue(dftdg)){
 			logger.info("DEFAULT from x-days to now");
 			String currentYear = String.valueOf(calendar.get(Calendar.YEAR)); 
-			list = godsjfDaoService.findDefault(currentYear, this.getFromDay(dftdg));
+			list = godsjfDaoService.findDefault(currentYear, this.getFromDay(dftdg), dao);
 		
 		}else{
-			logger.info("ALL RECORDS...");
-			list = godsjfDaoService.findAll(this.ALL_RECORDS, new StringBuffer("order by gogn desc"));
+			Map<String, Object> params = this.getParams(dao);
+			if(params != null && params.size()>0){
+				list = godsjfDaoService.findAll(params, new StringBuffer("order by gogn desc"));
+			}else{
+				logger.info("ALL RECORDS...");
+				list = godsjfDaoService.findAll(this.ALL_RECORDS, new StringBuffer("order by gogn desc"));
+			}
 			
 		}
 		logger.info(list.size());
 		return list;
+	}
+	/**
+	 * 
+	 * @param dao
+	 * @return
+	 */
+	private Map <String, Object> getParams ( GodsjfDao dao){
+		Map<String, Object> params = new HashMap<String, Object>();
+		if(StringUtils.hasValue(dao.getGotrnr())){
+			params.put("gotrnr", dao.getGotrnr());
+		}
+		if(StringUtils.hasValue(dao.getGoturn())){
+			params.put("goturn", dao.getGoturn());
+		}
+		if(StringUtils.hasValue(dao.getGobiln())){
+			params.put("gobiln", dao.getGobiln());
+		}
+		return params;
 	}
 	
 	/**
