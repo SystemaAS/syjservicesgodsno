@@ -8,6 +8,7 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import no.systema.jservices.common.dao.DokufDao;
@@ -131,6 +133,91 @@ public class JsonResponseOutputterController_GODSJF {
 
 		  
 	}
+	
+	/**
+	 * (1) Update: http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSJF_U.do?user=OSCAR&mode=U/A/D...&gogn=201801062173001...etc
+	 * 
+	 * @param session
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "syjsSYGODSJF_U.do", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public JsonGenericContainerDao syjsSYGODSJF_U(HttpSession session, HttpServletRequest request) {
+		JsonGenericContainerDao container = new JsonGenericContainerDao();
+		
+		JsonResponseWriter2<GodsjfDao> jsonWriter = new JsonResponseWriter2<GodsjfDao>();
+		StringBuffer sb = new StringBuffer();
+		String userName = null;
+		String errMsg = null;
+		String status = null;
+		StringBuffer dbErrorStackTrace = null;
+
+		try {
+			logger.info("Inside syjsDOKUF_U.do");
+			String user = request.getParameter("user");
+			String mode = request.getParameter("mode");
+			// Check ALWAYS user in BRIDF
+			userName = bridfDaoService.getUserName(user); 
+			errMsg = "";
+			status = "ok";
+			dbErrorStackTrace = new StringBuffer();
+			GodsjfDao dao = new GodsjfDao();
+			GodsjfDao resultDao = new GodsjfDao();
+			ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
+			binder.bind(request);
+			
+			//TODO:  rulerLord ? or data validated in UI?
+
+			if (userName != null && !"".equals(userName)) {
+				if ("D".equals(mode)) {
+					//logger.info("DELETE DOKUF");
+					//dokufDaoService.delete(dao);
+				} else if ("A".equals(mode)) {
+					//logger.info("CREATE NEW DOKUF");
+					//resultDao = dokufDaoService.create(dao);
+				} else if ("U".equals(mode)) {
+					//logger.info("UPDATE DOKUF");
+					resultDao = godsjfDaoService.update(dao);
+				}
+				if (resultDao == null) {
+					errMsg = "ERROR on UPDATE Could not add/update dao " + ReflectionToStringBuilder.toString(dao);
+					status = "error ";
+					//dbErrorStackTrace.append("Could not add/update dao=" + ReflectionToStringBuilder.toString(dao));
+					//sb.append(jsonWriter.setJsonSimpleErrorResult(userName, errMsg, status, dbErrorStackTrace));
+					logger.info(status + errMsg);
+					container.setErrMsg(errMsg);
+				} else {
+					// OK UPDATE
+					container.setUser(user);
+					Collection listUpd = new ArrayList<GodsjfDao>();
+					listUpd.add(dao);
+					container.setList(listUpd);
+				}
+
+			} else {
+				// write JSON error output
+				errMsg = "ERROR on UPDATE request input parameters are invalid: <user>";
+				status = "error";
+				//dbErrorStackTrace.append("request input parameters are invalid: <user>");
+				//sb.append(jsonWriter.setJsonSimpleErrorResult(userName, errMsg, status, dbErrorStackTrace));
+				logger.info(status + errMsg);
+				container.setErrMsg(errMsg);
+			}
+
+		} catch (Exception e) {
+			errMsg = "ERROR on UPDATE ";
+			status = "error ";
+			//dbErrorStackTrace.append(e.getMessage());
+			//sb.append(jsonWriter.setJsonSimpleErrorResult(userName, errMsg, status,dbErrorStackTrace));
+			logger.info("Error:" + e.toString());
+			container.setErrMsg(errMsg);
+		}
+		session.invalidate();
+		return container;
+
+	}
+	
 	/**
 	 * 
 	 * @param gogn (godsnr)
