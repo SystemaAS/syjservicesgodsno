@@ -146,71 +146,56 @@ public class JsonResponseOutputterController_GODSJF {
 	public JsonGenericContainerDao syjsSYGODSJF_U(HttpSession session, HttpServletRequest request) {
 		JsonGenericContainerDao container = new JsonGenericContainerDao();
 		
-		JsonResponseWriter2<GodsjfDao> jsonWriter = new JsonResponseWriter2<GodsjfDao>();
-		StringBuffer sb = new StringBuffer();
 		String userName = null;
 		String errMsg = null;
 		String status = null;
-		StringBuffer dbErrorStackTrace = null;
-
+		
 		try {
-			logger.info("Inside syjsDOKUF_U.do");
+			logger.info("Inside syjsSYGODSJF_U.do");
 			String user = request.getParameter("user");
 			String mode = request.getParameter("mode");
 			// Check ALWAYS user in BRIDF
 			userName = bridfDaoService.getUserName(user); 
 			errMsg = "";
 			status = "ok";
-			dbErrorStackTrace = new StringBuffer();
 			GodsjfDao dao = new GodsjfDao();
 			GodsjfDao resultDao = new GodsjfDao();
 			ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
 			binder.bind(request);
 			
-			//TODO:  rulerLord ? or data validated in UI?
-
 			if (userName != null && !"".equals(userName)) {
 				if ("D".equals(mode)) {
-					//logger.info("DELETE DOKUF");
+					//logger.info("DELETE GODSJF");
 					//dokufDaoService.delete(dao);
 				} else if ("A".equals(mode)) {
-					//logger.info("CREATE NEW DOKUF");
-					//resultDao = dokufDaoService.create(dao);
+					logger.info("CREATE NEW GODSJF");
+					resultDao = godsjfDaoService.create(dao);
 				} else if ("U".equals(mode)) {
-					//logger.info("UPDATE DOKUF");
+					logger.info("UPDATE GODSJF");
 					resultDao = godsjfDaoService.update(dao);
 				}
 				if (resultDao == null) {
 					errMsg = "ERROR on UPDATE Could not add/update dao " + ReflectionToStringBuilder.toString(dao);
-					status = "error ";
-					//dbErrorStackTrace.append("Could not add/update dao=" + ReflectionToStringBuilder.toString(dao));
-					//sb.append(jsonWriter.setJsonSimpleErrorResult(userName, errMsg, status, dbErrorStackTrace));
-					logger.info(status + errMsg);
+					logger.info(errMsg);
 					container.setErrMsg(errMsg);
 				} else {
 					// OK UPDATE
+					logger.info("Update OK");
 					container.setUser(user);
-					Collection listUpd = new ArrayList<GodsjfDao>();
-					listUpd.add(dao);
+					Collection<GodsjfDao> listUpd = new ArrayList<GodsjfDao>(); listUpd.add(dao);
 					container.setList(listUpd);
 				}
 
 			} else {
 				// write JSON error output
 				errMsg = "ERROR on UPDATE request input parameters are invalid: <user>";
-				status = "error";
-				//dbErrorStackTrace.append("request input parameters are invalid: <user>");
-				//sb.append(jsonWriter.setJsonSimpleErrorResult(userName, errMsg, status, dbErrorStackTrace));
-				logger.info(status + errMsg);
+				logger.info(errMsg);
 				container.setErrMsg(errMsg);
 			}
 
 		} catch (Exception e) {
 			errMsg = "ERROR on UPDATE ";
-			status = "error ";
-			//dbErrorStackTrace.append(e.getMessage());
-			//sb.append(jsonWriter.setJsonSimpleErrorResult(userName, errMsg, status,dbErrorStackTrace));
-			logger.info("Error:" + e.toString());
+			logger.info("ERROR:" + e.toString());
 			container.setErrMsg(errMsg);
 		}
 		session.invalidate();
@@ -226,6 +211,7 @@ public class JsonResponseOutputterController_GODSJF {
 	private List<GodsjfDao> fetchRecords(String gogn, String dftdg, GodsjfDao dao) {
 		List<GodsjfDao> list = new ArrayList<GodsjfDao>();
 		Calendar calendar = Calendar.getInstance();
+		String ORDER_BY_DESC = "order by gogn desc";
 		
 		if(StringUtils.hasValue(gogn)){
 			logger.info("MATCH: gogn");
@@ -234,6 +220,11 @@ public class JsonResponseOutputterController_GODSJF {
 			//Exact match
 			list = godsjfDaoService.findAll(params);
 			
+		}else if(filterExists(dao)){
+			logger.info("Filter in action...");
+			Map<String, Object> params = this.getParams(dao); 
+			list = godsjfDaoService.findAll(params, new StringBuffer(ORDER_BY_DESC));
+		
 		}else if(StringUtils.hasValue(dftdg)){
 			logger.info("DEFAULT from x-days to now");
 			String currentYear = String.valueOf(calendar.get(Calendar.YEAR)); 
@@ -242,12 +233,11 @@ public class JsonResponseOutputterController_GODSJF {
 		}else{
 			Map<String, Object> params = this.getParams(dao);
 			if(params != null && params.size()>0){
-				list = godsjfDaoService.findAll(params, new StringBuffer("order by gogn desc"));
+				list = godsjfDaoService.findAll(params, new StringBuffer(ORDER_BY_DESC));
 			}else{
 				logger.info("ALL RECORDS...");
-				list = godsjfDaoService.findAll(this.ALL_RECORDS, new StringBuffer("order by gogn desc"));
+				list = godsjfDaoService.findAll(this.ALL_RECORDS, new StringBuffer(ORDER_BY_DESC));
 			}
-			
 		}
 		logger.info(list.size());
 		return list;
@@ -257,8 +247,27 @@ public class JsonResponseOutputterController_GODSJF {
 	 * @param dao
 	 * @return
 	 */
+	private boolean filterExists(GodsjfDao dao){
+		boolean retval = false;
+		if(StringUtils.hasValue(dao.getGotrnr())){
+			retval = true;
+		}
+		if(StringUtils.hasValue(dao.getGoturn())){
+			retval = true;
+		}
+		if(StringUtils.hasValue(dao.getGobiln())){
+			retval = true;
+		}
+		return retval;
+	}
+	/**
+	 * 
+	 * @param dao
+	 * @return
+	 */
 	private Map <String, Object> getParams ( GodsjfDao dao){
 		Map<String, Object> params = new HashMap<String, Object>();
+		
 		if(StringUtils.hasValue(dao.getGotrnr())){
 			params.put("gotrnr", dao.getGotrnr());
 		}
@@ -268,6 +277,7 @@ public class JsonResponseOutputterController_GODSJF {
 		if(StringUtils.hasValue(dao.getGobiln())){
 			params.put("gobiln", dao.getGobiln());
 		}
+		
 		return params;
 	}
 	
