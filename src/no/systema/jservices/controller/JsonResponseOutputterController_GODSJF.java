@@ -11,7 +11,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,12 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import no.systema.jservices.common.dao.DokufDao;
 import no.systema.jservices.common.dao.GodsjfDao;
 import no.systema.jservices.entities.JsonGenericContainerDao;
 import no.systema.jservices.common.dao.services.BridfDaoService;
 import no.systema.jservices.common.dao.services.GodsjfDaoService;
-import no.systema.jservices.common.json.JsonResponseWriter2;
 import no.systema.jservices.common.util.StringUtils;
 
 
@@ -104,7 +101,7 @@ public class JsonResponseOutputterController_GODSJF {
 					container.setUser(user);
 					container.setList(list);
 				} else {
-					errMsg = "ERROR on SELECT: Can not find DokufDao list";
+					errMsg = "ERROR on SELECT: Can not find Dao list";
 					status = "error";
 					logger.info(status + errMsg);
 					//sb.append(jsonWriter.setJsonSimpleErrorResult(userName, errMsg, status, dbErrorStackTrace));
@@ -114,7 +111,7 @@ public class JsonResponseOutputterController_GODSJF {
 			} else {
 				errMsg = "ERROR on SELECT";
 				status = "error";
-				dbErrorStackTrace.append(" request input parameters are invalid: <user> <dfavd> <dfopd>");
+				dbErrorStackTrace.append(" request input parameters are invalid: <user> ...");
 				//sb.append(jsonWriter.setJsonSimpleErrorResult(userName, errMsg, status, dbErrorStackTrace));
 				container.setErrMsg(errMsg + dbErrorStackTrace.toString());
 			}
