@@ -194,8 +194,8 @@ public class JsonResponseOutputterController_GODSJF {
 			}
 
 		} catch (Exception e) {
-			errMsg = "ERROR on UPDATE ";
 			logger.info("ERROR:" + e.toString());
+			errMsg = "ERROR on UPDATE " + e.toString();
 			container.setErrMsg(errMsg);
 		}
 		session.invalidate();
