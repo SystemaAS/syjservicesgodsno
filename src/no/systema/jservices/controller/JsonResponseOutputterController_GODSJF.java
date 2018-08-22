@@ -255,6 +255,9 @@ public class JsonResponseOutputterController_GODSJF {
 		if(StringUtils.hasValue(dao.getGobiln())){
 			retval = true;
 		}
+		if(StringUtils.hasValue(dao.getGomott())){
+			retval = true;
+		}
 		return retval;
 	}
 	/**
@@ -273,6 +276,9 @@ public class JsonResponseOutputterController_GODSJF {
 		}
 		if(StringUtils.hasValue(dao.getGobiln())){
 			params.put("gobiln", dao.getGobiln());
+		}
+		if(StringUtils.hasValue(dao.getGomott())){
+			params.put("gomott", dao.getGomott() + "%");
 		}
 		
 		return params;
