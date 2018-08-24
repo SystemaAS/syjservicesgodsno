@@ -35,7 +35,7 @@ import no.systema.jservices.common.util.StringUtils;
 public class JsonResponseOutputterController_GODSAF {
 	private static final Logger logger = Logger.getLogger(JsonResponseOutputterController_GODSAF.class.getName());
 	private final Map<String, Object> ALL_RECORDS = null;
-	String ORDER_BY_DESC = "order by gflavd desc";
+	String ORDER_BY = "order by gflavd asc";
 	
 	@Autowired
 	private GodsafDaoService godsafDaoService;
@@ -101,7 +101,7 @@ public class JsonResponseOutputterController_GODSAF {
 					list = godsafDaoService.findAll(params);
 				}else{
 					logger.info("ALL RECORDS...");
-					list = godsafDaoService.findAll(this.ALL_RECORDS, new StringBuffer(ORDER_BY_DESC));
+					list = godsafDaoService.findAll(this.ALL_RECORDS, new StringBuffer(ORDER_BY));
 				}
 				
 				if (list != null) {

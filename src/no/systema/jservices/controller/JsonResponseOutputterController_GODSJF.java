@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import no.systema.jservices.common.dao.GodsjfDao;
+import no.systema.jservices.common.dao.IDao;
 import no.systema.jservices.entities.JsonGenericContainerDao;
 import no.systema.jservices.common.dao.services.BridfDaoService;
 import no.systema.jservices.common.dao.services.GodsjfDaoService;
@@ -141,7 +142,7 @@ public class JsonResponseOutputterController_GODSJF {
 	@RequestMapping(value = "syjsSYGODSJF_U.do", method = { RequestMethod.GET, RequestMethod.POST })
 	@ResponseBody
 	public JsonGenericContainerDao syjsSYGODSJF_U(HttpSession session, HttpServletRequest request) {
-		JsonGenericContainerDao container = new JsonGenericContainerDao();
+		JsonGenericContainerDao<IDao> container = new JsonGenericContainerDao<IDao>();
 		
 		String userName = null;
 		String errMsg = null;
@@ -163,7 +164,7 @@ public class JsonResponseOutputterController_GODSJF {
 			if (userName != null && !"".equals(userName)) {
 				if ("D".equals(mode)) {
 					//logger.info("DELETE GODSJF");
-					//dokufDaoService.delete(dao);
+					//There is no removal just and update. The update will be on column: gotrnr=*SLETTET
 				} else if ("A".equals(mode)) {
 					logger.info("CREATE NEW GODSJF");
 					resultDao = godsjfDaoService.create(dao);
@@ -179,7 +180,8 @@ public class JsonResponseOutputterController_GODSJF {
 					// OK UPDATE
 					logger.info("Update OK");
 					container.setUser(user);
-					Collection<GodsjfDao> listUpd = new ArrayList<GodsjfDao>(); listUpd.add(dao);
+					Collection<IDao> listUpd = new ArrayList<IDao>(); 
+					listUpd.add(dao);
 					container.setList(listUpd);
 				}
 

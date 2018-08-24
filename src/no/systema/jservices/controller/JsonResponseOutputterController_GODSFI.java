@@ -31,7 +31,6 @@ import no.systema.jservices.common.util.StringUtils;
  * @date Jun 2018
  */
 @RestController
-//@RequestMapping(value="/syjsSYGODSAF.do")
 public class JsonResponseOutputterController_GODSFI {
 	private static final Logger logger = Logger.getLogger(JsonResponseOutputterController_GODSFI.class.getName());
 	private final Map<String, Object> ALL_RECORDS = null;
