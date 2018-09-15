@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import no.systema.jservices.common.dao.GodsfiDao;
+import no.systema.jservices.common.dao.IDao;
 import no.systema.jservices.entities.JsonGenericContainerDao;
 import no.systema.jservices.common.dao.services.BridfDaoService;
 import no.systema.jservices.common.dao.services.GodsfiDaoService;
@@ -95,8 +96,13 @@ public class JsonResponseOutputterController_GODSFI {
 
 				if(StringUtils.hasValue(dao.getGflbko())){
 					logger.info("MATCH: bko");
-					Map<String, Object> params = dao.getKeys();
-					//Exact match
+					Map<String, Object> params = new HashMap<String, Object>();
+					params.put("gflbko", dao.getGflbko());
+					if(StringUtils.hasValue(dao.getGflbs1())){
+						//Exact match
+						logger.info("MATCH: unique");
+						params.put("gflbs1", dao.getGflbs1());
+					}
 					list = godsfiDaoService.findAll(params);
 				}else{
 					logger.info("ALL RECORDS...");
@@ -137,6 +143,75 @@ public class JsonResponseOutputterController_GODSFI {
 		  
 	}
 
+	/**
+	 * (1) Update: http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSFI_U.do?user=OSCAR&mode=U/A/D...&gflbko=1111&gflbs1=OWN_TEXT...etc
+	 * 
+	 * @param session
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "syjsSYGODSFI_U.do", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public JsonGenericContainerDao syjsSYGODSFI_U(HttpSession session, HttpServletRequest request) {
+		JsonGenericContainerDao<IDao> container = new JsonGenericContainerDao<IDao>();
+		
+		String userName = null;
+		String errMsg = null;
+		String status = null;
+		
+		try {
+			logger.info("Inside syjsSYGODSFI_U.do");
+			String user = request.getParameter("user");
+			String mode = request.getParameter("mode");
+			// Check ALWAYS user in BRIDF
+			userName = bridfDaoService.getUserName(user); 
+			errMsg = "";
+			status = "ok";
+			GodsfiDao dao = new GodsfiDao();
+			GodsfiDao resultDao = new GodsfiDao();
+			ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
+			binder.bind(request);
+			
+			if (userName != null && !"".equals(userName)) {
+				if ("D".equals(mode)) {
+					logger.info("DELETE GODSFI");
+					godsfiDaoService.delete(dao);
+				} else if ("A".equals(mode)) {
+					logger.info("CREATE NEW GODSFI");
+					resultDao = godsfiDaoService.create(dao);
+				} else if ("U".equals(mode)) {
+					logger.info("UPDATE GODSFI");
+					resultDao = godsfiDaoService.update(dao);
+				}
+				if (resultDao == null) {
+					errMsg = "ERROR on UPDATE Could not add/update dao " + ReflectionToStringBuilder.toString(dao);
+					logger.info(errMsg);
+					container.setErrMsg(errMsg);
+				} else {
+					// OK UPDATE
+					logger.info("Update OK");
+					container.setUser(user);
+					Collection<IDao> listUpd = new ArrayList<IDao>(); 
+					listUpd.add(dao);
+					container.setList(listUpd);
+				}
+
+			} else {
+				// write JSON error output
+				errMsg = "ERROR on UPDATE request input parameters are invalid: <user>";
+				logger.info(errMsg);
+				container.setErrMsg(errMsg);
+			}
+
+		} catch (Exception e) {
+			logger.info("ERROR:" + e.toString());
+			errMsg = "ERROR on UPDATE " + e.toString();
+			container.setErrMsg(errMsg);
+		}
+		session.invalidate();
+		return container;
+
+	}
 	
 	
 }
