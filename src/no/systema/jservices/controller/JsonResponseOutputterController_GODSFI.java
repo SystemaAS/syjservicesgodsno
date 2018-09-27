@@ -98,11 +98,10 @@ public class JsonResponseOutputterController_GODSFI {
 					logger.info("MATCH: bko");
 					Map<String, Object> params = new HashMap<String, Object>();
 					params.put("gflbko", dao.getGflbko());
-					if(StringUtils.hasValue(dao.getGflbs1())){
-						//Exact match
-						logger.info("MATCH: unique");
-						params.put("gflbs1", dao.getGflbs1());
-					}
+					//Exact match
+					logger.info("MATCH: unique");
+					params.put("gfenh", dao.getGfenh());
+					
 					list = godsfiDaoService.findAll(params);
 				}else{
 					logger.info("ALL RECORDS...");
@@ -144,7 +143,7 @@ public class JsonResponseOutputterController_GODSFI {
 	}
 
 	/**
-	 * (1) Update: http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSFI_U.do?user=OSCAR&mode=U/A/D...&gflbko=1111&gflbs1=OWN_TEXT...etc
+	 * (1) Update: http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSFI_U.do?user=OSCAR&mode=U/A/D...&gflbko=1111&gfenh=2...etc
 	 * 
 	 * @param session
 	 * @param request

@@ -65,7 +65,7 @@ public class JsonResponseOutputterController_GODSGF {
 	}
 	
 	/**
-	 * Db-file: 	GODSJF
+	 * Db-file: 	GODSGF
 	 * 
 	 * @Example 
 	 * (1) SELECT list http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSGF.do?user=OSCAR
