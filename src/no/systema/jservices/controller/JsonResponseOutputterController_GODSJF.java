@@ -79,6 +79,7 @@ public class JsonResponseOutputterController_GODSJF {
 		JsonGenericContainerDao container = new JsonGenericContainerDao();
 		
 		String gogn = request.getParameter("gogn");
+		String gotrnr = request.getParameter("gotrnr");
 		String dftdg = request.getParameter("dftdg");
 		
 		List<GodsjfDao> list = new ArrayList<GodsjfDao>();
@@ -96,7 +97,7 @@ public class JsonResponseOutputterController_GODSJF {
 				ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
 				binder.bind(request);
 				
-				list = this.fetchRecords(gogn, dftdg, dao);
+				list = this.fetchRecords(gogn, gotrnr, dftdg, dao);
 				
 				if (list != null) {
 					container.setUser(user);
@@ -152,27 +153,38 @@ public class JsonResponseOutputterController_GODSJF {
 			logger.info("Inside syjsSYGODSJF_U.do");
 			String user = request.getParameter("user");
 			String mode = request.getParameter("mode");
+			String gotrnrOrig = request.getParameter("gotrnrOrig");
+			
 			// Check ALWAYS user in BRIDF
 			userName = bridfDaoService.getUserName(user); 
 			errMsg = "";
 			status = "ok";
 			GodsjfDao dao = new GodsjfDao();
 			GodsjfDao resultDao = new GodsjfDao();
+			//
+			int crud = 0;
 			ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
 			binder.bind(request);
 			
 			if (userName != null && !"".equals(userName)) {
 				if ("D".equals(mode)) {
-					//logger.info("DELETE GODSJF");
+					logger.info("DELETE GODSJF");
 					//There is no removal just and update. The update will be on column: gotrnr=*SLETTET
+					crud = godsjfDaoService.deleteSpecialCase(dao);
+					resultDao = new GodsjfDao();//dummy to avoid general ERROR below...
 				} else if ("A".equals(mode)) {
 					logger.info("CREATE NEW GODSJF");
 					resultDao = godsjfDaoService.create(dao);
 				} else if ("U".equals(mode)) {
 					logger.info("UPDATE GODSJF");
 					resultDao = godsjfDaoService.update(dao);
+				} else if ("UTR".equals(mode)) {
+					logger.info("UPDATE SPECIAL CASE TRANSITTNR-key update GODSJF");
+					crud = godsjfDaoService.updateTransittSpecialCase(dao, gotrnrOrig);
+					resultDao = new GodsjfDao();//dummy to avoid general ERROR below...
 				}
-				if (resultDao == null) {
+				//
+				if (resultDao == null || crud < 0) {
 					errMsg = "ERROR on UPDATE Could not add/update dao " + ReflectionToStringBuilder.toString(dao);
 					logger.info(errMsg);
 					container.setErrMsg(errMsg);
@@ -204,10 +216,13 @@ public class JsonResponseOutputterController_GODSJF {
 	
 	/**
 	 * 
-	 * @param gogn (godsnr)
+	 * @param gogn
+	 * @param gotrnr
+	 * @param dftdg
+	 * @param dao
 	 * @return
 	 */
-	private List<GodsjfDao> fetchRecords(String gogn, String dftdg, GodsjfDao dao) {
+	private List<GodsjfDao> fetchRecords(String gogn, String gotrnr, String dftdg, GodsjfDao dao) {
 		List<GodsjfDao> list = new ArrayList<GodsjfDao>();
 		Calendar calendar = Calendar.getInstance();
 		String ORDER_BY_DESC = "order by gogn desc";
@@ -216,6 +231,9 @@ public class JsonResponseOutputterController_GODSJF {
 			logger.info("MATCH: gogn");
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("gogn", gogn + "%");
+			if(StringUtils.hasValue(gotrnr)){
+				params.put("gotrnr", gotrnr);
+			}
 			//Exact match
 			list = godsjfDaoService.findAll(params);
 			
@@ -248,9 +266,7 @@ public class JsonResponseOutputterController_GODSJF {
 	 */
 	private boolean filterExists(GodsjfDao dao){
 		boolean retval = false;
-		if(StringUtils.hasValue(dao.getGotrnr())){
-			retval = true;
-		}
+		
 		if(StringUtils.hasValue(dao.getGoturn())){
 			retval = true;
 		}
@@ -270,9 +286,6 @@ public class JsonResponseOutputterController_GODSJF {
 	private Map <String, Object> getParams ( GodsjfDao dao){
 		Map<String, Object> params = new HashMap<String, Object>();
 		
-		if(StringUtils.hasValue(dao.getGotrnr())){
-			params.put("gotrnr", dao.getGotrnr());
-		}
 		if(StringUtils.hasValue(dao.getGoturn())){
 			params.put("goturn", dao.getGoturn());
 		}
