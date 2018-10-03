@@ -231,7 +231,7 @@ public class JsonResponseOutputterController_GODSJF {
 			logger.info("MATCH: gogn");
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("gogn", gogn + "%");
-			if(StringUtils.hasValue(gotrnr)){
+			if(gotrnr!=null){ //in this special case we must allow empty string but not NULL
 				params.put("gotrnr", gotrnr);
 			}
 			//Exact match
