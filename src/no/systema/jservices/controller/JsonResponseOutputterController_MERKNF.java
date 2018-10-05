@@ -113,6 +113,68 @@ public class JsonResponseOutputterController_MERKNF {
 	}
 	
 	/**
+	 * Db-file: 	MERKNF
+	 * 
+	 * @Example 
+	 * (1) SELECT list http://gw.systema.no:8080/syjservicesgodsno/syjsSYMERKNF_COUNT.do?user=OSCAR
+	 * 
+	*/
+	@RequestMapping(path="/syjsSYMERKNF_COUNT.do",method = { RequestMethod.GET, RequestMethod.POST } )
+	public JsonGenericContainerDao getSymerknfCount(@RequestParam("user") String user, HttpSession session, HttpServletRequest request ){
+		JsonGenericContainerDao container = new JsonGenericContainerDao();
+		
+		String gogn = request.getParameter("gogn");
+		String gotrnr = request.getParameter("gotrnr");
+		
+		try {
+			logger.info("Inside syjsSYMERKNF_COUNT.do");
+			// Check ALWAYS user in BRIDF
+			String userName = bridfDaoService.getUserName(user);
+			String errMsg = "";
+			String status = "ok";
+			StringBuffer dbErrorStackTrace = new StringBuffer();
+			int retval = 0;
+			if (StringUtils.hasValue(userName)) {
+				MerknfDao dao = new MerknfDao();
+				ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
+				binder.bind(request);
+				retval = this.childrenExist(gogn, gotrnr);
+				logger.info("COUNTER:"+ retval);
+				container.setUser(user);
+				Collection<IDao> listUpd = new ArrayList<IDao>(); 
+				
+				if (retval > 0) {
+					dao.setGogn(gogn);
+					listUpd.add(dao);
+					container.setList(listUpd);
+				} else {
+					container.setList(listUpd);
+				}
+
+			} else {
+				errMsg = "ERROR on SELECT";
+				status = "error";
+				dbErrorStackTrace.append(" request input parameters are invalid: <user> ...");
+				//sb.append(jsonWriter.setJsonSimpleErrorResult(userName, errMsg, status, dbErrorStackTrace));
+				container.setErrMsg(errMsg + dbErrorStackTrace.toString());
+			}
+		} catch (Exception e) {
+			logger.info("Error :", e);
+			Writer writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			e.printStackTrace(printWriter);
+			//return "ERROR [JsonResponseOutputterController]" + writer.toString();
+			container.setErrMsg("ERROR [JsonResponseOutputterController]" + writer.toString());
+			
+		}
+
+		session.invalidate();
+		return container;
+
+		  
+	}
+	
+	/**
 	 * (1) Update: http://gw.systema.no:8080/syjservicesgodsno/syjsSYMERKNF_U.do?user=OSCAR&mode=U/A/D...&gogn=201801062173001...etc
 	 * 
 	 * @param session
@@ -222,6 +284,20 @@ public class JsonResponseOutputterController_MERKNF {
 		}
 		logger.info(list.size());
 		return list;
+	}
+	
+	/**
+	 * To know if a parent table (usually GODSJF) has children
+	 * @param gogn
+	 * @param gotrnr
+	 * @return
+	 */
+	private int childrenExist(String gogn, String gotrnr) {
+		int retval = 0;
+		if(StringUtils.hasValue(gogn) && gotrnr!=null){
+			retval= merknfDaoService.findById(gogn, gotrnr);
+		}
+		return retval;
 	}
 	/**
 	 * 
