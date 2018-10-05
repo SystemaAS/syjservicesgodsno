@@ -198,13 +198,12 @@ public class JsonResponseOutputterController_MERKNF {
 	 */
 	private List<MerknfDao> fetchRecords(String gogn, String gotrnr, String gopos, MerknfDao dao) {
 		List<MerknfDao> list = new ArrayList<MerknfDao>();
-		Calendar calendar = Calendar.getInstance();
 		String ORDER_BY = "order by gopos asc";
 		
-		if(StringUtils.hasValue(gopos)){
+		if(StringUtils.hasValue(gopos) && !"0".equals(gopos)){
 			logger.info("MATCH: gogn");
 			Map<String, Object> params = dao.getKeys();
-			params.put("gopos", gopos);
+			//params.put("gopos", gopos);
 			//Exact match
 			list = merknfDaoService.findAll(params);
 			
@@ -214,7 +213,9 @@ public class JsonResponseOutputterController_MERKNF {
 			list = merknfDaoService.findAll(params, new StringBuffer(ORDER_BY));
 		
 		}else{
-			Map<String, Object> params = dao.getKeys();
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("gogn", gogn);
+			params.put("gotrnr", gotrnr);
 			if(params != null && params.size()>0){
 				list = merknfDaoService.findAll(params, new StringBuffer(ORDER_BY));
 			}
@@ -254,7 +255,7 @@ public class JsonResponseOutputterController_MERKNF {
 		if(StringUtils.hasValue(dao.getGomerd())){
 			retval = true;
 		}
-		if(StringUtils.hasValue(dao.getGomer())){
+		if(StringUtils.hasValue(dao.getGomer1())){
 			retval = true;
 		}
 		if(StringUtils.hasValue(dao.getGomkod())){
@@ -268,8 +269,7 @@ public class JsonResponseOutputterController_MERKNF {
 	 * @return
 	 */
 	private Map <String, Object> getParams ( MerknfDao dao){
-		Map<String, Object> params = new HashMap<String, Object>();
-		
+		Map<String, Object> params = dao.getKeys();
 		
 		if(dao.getGoantk()>0){
 			params.put("goantk", dao.getGoantk());
@@ -295,27 +295,14 @@ public class JsonResponseOutputterController_MERKNF {
 		if(StringUtils.hasValue(dao.getGomerd())){
 			params.put("gomerd", dao.getGomerd());
 		}
-		if(StringUtils.hasValue(dao.getGomer())){
-			params.put("gomer", dao.getGomer());
+		if(StringUtils.hasValue(dao.getGomer1())){
+			params.put("gomer1", dao.getGomer1());
 		}
 		if(StringUtils.hasValue(dao.getGomkod())){
 			params.put("gomkod", dao.getGomkod());
 		}
 		
 		return params;
-	}
-	
-	/**
-	 * 
-	 * @param dftdg
-	 * @return
-	 */
-	private String getFromDay(String dftdg){
-		int dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-		int daysBack = Integer.parseInt(dftdg);
-		return String.valueOf(dayOfYear - daysBack);
-	}
-	
-	
+	}	
 	
 }
