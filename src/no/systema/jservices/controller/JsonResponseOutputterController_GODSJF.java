@@ -246,7 +246,7 @@ public class JsonResponseOutputterController_GODSJF {
 			logger.info("DEFAULT from x-days to now");
 			String currentYear = String.valueOf(calendar.get(Calendar.YEAR)); 
 			list = godsjfDaoService.findDefault(currentYear, this.getFromDay(dftdg), dao);
-		
+			logger.info("LIST SIZE:" + list.size());
 		}else{
 			Map<String, Object> params = this.getParams(dao);
 			if(params != null && params.size()>0){
