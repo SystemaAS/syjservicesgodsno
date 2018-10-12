@@ -96,7 +96,7 @@ public class JsonResponseOutputterController_GODSJF {
 				GodsjfDao dao = new GodsjfDao();
 				ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
 				binder.bind(request);
-				
+				logger.info("gotrnr:" + gotrnr);
 				list = this.fetchRecords(gogn, gotrnr, dftdg, dao);
 				
 				if (list != null) {
@@ -232,7 +232,7 @@ public class JsonResponseOutputterController_GODSJF {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("gogn", gogn + "%");
 			if(gotrnr!=null){ //in this special case we must allow empty string but not NULL
-				params.put("gotrnr", gotrnr);
+				params.put("gotrnr", gotrnr + "%");
 			}
 			//Exact match
 			list = godsjfDaoService.findAll(params);
@@ -266,7 +266,9 @@ public class JsonResponseOutputterController_GODSJF {
 	 */
 	private boolean filterExists(GodsjfDao dao){
 		boolean retval = false;
-		
+		if(StringUtils.hasValue(dao.getGotrnr())){
+			retval = true;
+		}
 		if(StringUtils.hasValue(dao.getGoturn())){
 			retval = true;
 		}
@@ -286,6 +288,9 @@ public class JsonResponseOutputterController_GODSJF {
 	private Map <String, Object> getParams ( GodsjfDao dao){
 		Map<String, Object> params = new HashMap<String, Object>();
 		
+		if(StringUtils.hasValue(dao.getGotrnr())){
+			params.put("gotrnr", dao.getGotrnr() + "%");
+		}
 		if(StringUtils.hasValue(dao.getGoturn())){
 			params.put("goturn", dao.getGoturn());
 		}
@@ -307,6 +312,8 @@ public class JsonResponseOutputterController_GODSJF {
 	private String getFromDay(String dftdg){
 		int dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 		int daysBack = Integer.parseInt(dftdg);
+		String retval = String.valueOf(dayOfYear - daysBack);
+		logger.info("DAY of YEAR:" + retval);
 		return String.valueOf(dayOfYear - daysBack);
 	}
 	

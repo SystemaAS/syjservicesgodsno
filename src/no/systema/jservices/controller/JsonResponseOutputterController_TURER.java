@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import no.systema.jservices.common.dao.LlmrfDao;
+import no.systema.jservices.common.dao.TurerDao;
 import no.systema.jservices.common.dao.IDao;
 import no.systema.jservices.entities.JsonGenericContainerDao;
 import no.systema.jservices.common.dao.services.BridfDaoService;
-import no.systema.jservices.common.dao.services.LlmrfDaoService;
+import no.systema.jservices.common.dao.services.TurerDaoService;
 import no.systema.jservices.common.util.StringUtils;
 
 
@@ -32,33 +32,33 @@ import no.systema.jservices.common.util.StringUtils;
  * @date Oct 2018
  */
 @RestController
-//@RequestMapping(value="/syjsSYLLMRF.do")
-public class JsonResponseOutputterController_LLMRF {
-	private static final Logger logger = Logger.getLogger(JsonResponseOutputterController_LLMRF.class.getName());
+//@RequestMapping(value="/syjsSYTURER.do")
+public class JsonResponseOutputterController_TURER {
+	private static final Logger logger = Logger.getLogger(JsonResponseOutputterController_TURER.class.getName());
 	
 	@Autowired
-	private LlmrfDaoService llmrfDaoService;
+	private TurerDaoService TurerDaoService;
 	@Autowired
 	private BridfDaoService bridfDaoService;
 
 	
 	/**
-	 * Db-file: 	LLMRF
+	 * Db-file: 	TURER
 	 * 
 	 * @Example 
-	 * (1) SELECT list http://gw.systema.no:8080/syjservicesgodsno/syjsSYLLMRF.do?user=OSCAR
+	 * (1) SELECT list http://gw.systema.no:8080/syjservicesgodsno/syjsSYTURER.do?user=OSCAR
 	 * 
 	 * @return
 	 */
-	@RequestMapping(path="/syjsSYLLMRF.do",method = { RequestMethod.GET, RequestMethod.POST } )
+	@RequestMapping(path="/syjsSYTURER.do",method = { RequestMethod.GET, RequestMethod.POST } )
 	public JsonGenericContainerDao getSygodsjf(@RequestParam("user") String user, HttpSession session, HttpServletRequest request ){
 		JsonGenericContainerDao container = new JsonGenericContainerDao();
 		
 	
-		List<LlmrfDao> list = new ArrayList<LlmrfDao>();
+		List<TurerDao> list = new ArrayList<TurerDao>();
 		
 		try {
-			logger.info("Inside syjsSYLLMRF.do");
+			logger.info("Inside syjsSTURER.do");
 			// Check ALWAYS user in BRIDF
 			String userName = bridfDaoService.getUserName(user);
 			String errMsg = "";
@@ -66,17 +66,17 @@ public class JsonResponseOutputterController_LLMRF {
 			StringBuffer dbErrorStackTrace = new StringBuffer();
 
 			if (StringUtils.hasValue(userName)) {
-				LlmrfDao dao = new LlmrfDao();
+				TurerDao dao = new TurerDao();
 				ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
 				binder.bind(request);
 				
 
-				if(StringUtils.hasValue(dao.getMrtrnr())){
-					logger.info("MATCH: MRTRNR");
+				if(StringUtils.hasValue(dao.getTupro())){
+					logger.info("MATCH: TUPRO");
 					Map<String, Object> params = new HashMap<String, Object>();
-					params.put("mrtrnr", dao.getMrtrnr());
+					params.put("tupro", dao.getTupro());
 					//Exact match
-					list = llmrfDaoService.findAll(params);
+					list = TurerDaoService.findAll(params);
 				}
 				
 				if (list != null) {
