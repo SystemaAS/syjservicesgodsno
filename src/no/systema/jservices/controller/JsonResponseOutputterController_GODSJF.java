@@ -79,6 +79,7 @@ public class JsonResponseOutputterController_GODSJF {
 		JsonGenericContainerDao container = new JsonGenericContainerDao();
 		
 		String gogn = request.getParameter("gogn");
+		String gogn2 = request.getParameter("gogn2");
 		String gotrnr = request.getParameter("gotrnr");
 		String dftdg = request.getParameter("dftdg");
 		
@@ -97,7 +98,7 @@ public class JsonResponseOutputterController_GODSJF {
 				ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
 				binder.bind(request);
 				logger.info("gotrnr:" + gotrnr);
-				list = this.fetchRecords(gogn, gotrnr, dftdg, dao);
+				list = this.fetchRecords(gogn, gotrnr, dftdg, dao, gogn2);
 				
 				if (list != null) {
 					container.setUser(user);
@@ -220,9 +221,10 @@ public class JsonResponseOutputterController_GODSJF {
 	 * @param gotrnr
 	 * @param dftdg
 	 * @param dao
+	 * @param gogn2
 	 * @return
 	 */
-	private List<GodsjfDao> fetchRecords(String gogn, String gotrnr, String dftdg, GodsjfDao dao) {
+	private List<GodsjfDao> fetchRecords(String gogn, String gotrnr, String dftdg, GodsjfDao dao, String gogn2) {
 		List<GodsjfDao> list = new ArrayList<GodsjfDao>();
 		Calendar calendar = Calendar.getInstance();
 		String ORDER_BY_DESC = "order by gogn desc";
@@ -234,8 +236,13 @@ public class JsonResponseOutputterController_GODSJF {
 			if(gotrnr!=null){ //in this special case we must allow empty string but not NULL
 				params.put("gotrnr", gotrnr + "%");
 			}
-			//Exact match
-			list = godsjfDaoService.findAll(params);
+			if(StringUtils.hasValue(gogn2)){
+				//Special case when search must be within a gogn interval
+				list = godsjfDaoService.findGognInterval(gogn2, dao);
+			}else{
+				//Generic find
+				list = godsjfDaoService.findAll(params);
+			}
 			
 		}else if(filterExists(dao)){
 			logger.info("Filter in action...");
