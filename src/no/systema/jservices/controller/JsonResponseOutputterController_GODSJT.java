@@ -68,19 +68,19 @@ public class JsonResponseOutputterController_GODSJT {
 	 * Db-file: 	Godsjt
 	 * 
 	 * @Example 
-	 * (1) SELECT list http://10.13.3.22:8080/syjservicesgodsno/syjsSYGodsjt.do?user=OSCAR
-	 * (2) Exact match godsnr: http://10.13.3.22:8080/syjservicesgodsno/syjsSYGodsjt.do?user=OSCAR&gtgn=201801062339501
+	 * (1) SELECT list http://10.13.3.22:8080/syjservicesgodsno/syjsSYGODSJT.do?user=OSCAR
+	 * (2) Exact match godsnr: http://10.13.3.22:8080/syjservicesgodsno/syjsSYGODSJT.do?user=OSCAR&gtgn=201801062339501
 	 * 
 	 * @return
 	 */
-	@RequestMapping(path="/syjsSYGodsjt.do",method = { RequestMethod.GET, RequestMethod.POST } )
-	public JsonGenericContainerDao getSygodsjf(@RequestParam("user") String user, HttpSession session, HttpServletRequest request ){
+	@RequestMapping(path="/syjsSYGODSJT.do",method = { RequestMethod.GET, RequestMethod.POST } )
+	public JsonGenericContainerDao syjsSYGODSJT(@RequestParam("user") String user, HttpSession session, HttpServletRequest request ){
 		JsonGenericContainerDao container = new JsonGenericContainerDao();
 		
 		List<GodsjtDao> list = new ArrayList<GodsjtDao>();
 		
 		try {
-			logger.info("Inside syjsSYGodsjt.do");
+			logger.info("Inside syjsSYGODSJT.do");
 			// Check ALWAYS user in BRIDF
 			String userName = bridfDaoService.getUserName(user);
 			String errMsg = "";
@@ -129,15 +129,15 @@ public class JsonResponseOutputterController_GODSJT {
 	}
 	
 	/**
-	 * (1) Update: http://gw.systema.no:8080/syjservicesgodsno/syjsSYGodsjt_U.do?user=OSCAR&mode=U/A/D...&gtgn=201801062173001...etc
+	 * (1) Update: http://gw.systema.no:8080/syjservicesgodsno/syjsSYGODSJT_U.do?user=OSCAR&mode=U/A/D...&gtgn=201801062173001...etc
 	 * 
 	 * @param session
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "syjsSYGodsjt_U.do", method = { RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(value = "syjsSYGODSJT_U.do", method = { RequestMethod.GET, RequestMethod.POST })
 	@ResponseBody
-	public JsonGenericContainerDao syjsSYGodsjt_U(HttpSession session, HttpServletRequest request) {
+	public JsonGenericContainerDao syjsSYGODSJT_U(HttpSession session, HttpServletRequest request) {
 		JsonGenericContainerDao<IDao> container = new JsonGenericContainerDao<IDao>();
 		
 		String userName = null;
@@ -145,7 +145,7 @@ public class JsonResponseOutputterController_GODSJT {
 		String status = null;
 		
 		try {
-			logger.info("Inside syjsSYGodsjt_U.do");
+			logger.info("Inside syjsSYGODSJT_U.do");
 			String user = request.getParameter("user");
 			String mode = request.getParameter("mode");
 			// Check ALWAYS user in BRIDF
