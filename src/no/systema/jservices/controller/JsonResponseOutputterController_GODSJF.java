@@ -82,6 +82,8 @@ public class JsonResponseOutputterController_GODSJF {
 		String gogn2 = request.getParameter("gogn2");
 		String gotrnr = request.getParameter("gotrnr");
 		String dftdg = request.getParameter("dftdg");
+		String dftdg2 = request.getParameter("dftdg2");
+		
 		
 		List<GodsjfDao> list = new ArrayList<GodsjfDao>();
 		
@@ -98,7 +100,7 @@ public class JsonResponseOutputterController_GODSJF {
 				ServletRequestDataBinder binder = new ServletRequestDataBinder(dao);
 				binder.bind(request);
 				logger.info("gotrnr:" + gotrnr);
-				list = this.fetchRecords(gogn, gotrnr, dftdg, dao, gogn2);
+				list = this.fetchRecords(gogn, gotrnr, dftdg, dftdg2, dao, gogn2);
 				
 				if (list != null) {
 					container.setUser(user);
@@ -224,7 +226,7 @@ public class JsonResponseOutputterController_GODSJF {
 	 * @param gogn2
 	 * @return
 	 */
-	private List<GodsjfDao> fetchRecords(String gogn, String gotrnr, String dftdg, GodsjfDao dao, String gogn2) {
+	private List<GodsjfDao> fetchRecords(String gogn, String gotrnr, String dftdg, String dftdg2, GodsjfDao dao, String gogn2) {
 		List<GodsjfDao> list = new ArrayList<GodsjfDao>();
 		Calendar calendar = Calendar.getInstance();
 		String ORDER_BY_DESC = "order by gogn desc";
@@ -252,7 +254,7 @@ public class JsonResponseOutputterController_GODSJF {
 		}else if(StringUtils.hasValue(dftdg)){
 			logger.info("DEFAULT from x-days to now");
 			String currentYear = String.valueOf(calendar.get(Calendar.YEAR)); 
-			list = godsjfDaoService.findDefault(currentYear, this.getFromDay(dftdg), dao);
+			list = godsjfDaoService.findDefault(currentYear, this.getDay(dftdg), this.getDay(dftdg2), dao);
 			logger.info("LIST SIZE:" + list.size());
 		}else{
 			Map<String, Object> params = this.getParams(dao);
@@ -316,12 +318,15 @@ public class JsonResponseOutputterController_GODSJF {
 	 * @param dftdg
 	 * @return
 	 */
-	private String getFromDay(String dftdg){
-		int dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-		int daysBack = Integer.parseInt(dftdg);
-		String retval = String.valueOf(dayOfYear - daysBack);
-		logger.info("DAY of YEAR:" + retval);
-		return String.valueOf(dayOfYear - daysBack);
+	private String getDay(String dftdg){
+		String retval = dftdg;
+		if(StringUtils.hasValue(dftdg)){
+			int dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+			int daysBack = Integer.parseInt(dftdg);
+			retval = String.valueOf(dayOfYear - daysBack);
+			logger.info("DAY of YEAR:" + retval);
+		}
+		return retval;
 	}
 	
 	
