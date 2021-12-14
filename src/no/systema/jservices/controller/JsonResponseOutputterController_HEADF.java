@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Required;
@@ -33,7 +33,7 @@ import no.systema.jservices.common.util.StringUtils;
 
 @Controller
 public class JsonResponseOutputterController_HEADF {
-	private static final Logger logger = Logger.getLogger(JsonResponseOutputterController_HEADF.class.getName());
+	private static final Logger logger = LogManager.getLogger(JsonResponseOutputterController_HEADF.class.getName());
 	private static String DAYS_TO_VIEW_DEFAULT = ApplicationPropertiesUtil.getProperty("no.systema.headf.daystoview.default");
 	
 	/**
